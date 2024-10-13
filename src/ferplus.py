@@ -135,11 +135,12 @@ class FERPlusReader(object):
                                                self.max_skew, 
                                                self.do_flip)
             final_image = imgu.preproc_img(distorted_image, A=self.A, A_pinv=self.A_pinv)
-
             inputs[idx-self.batch_start]    = final_image
             targets[idx-self.batch_start,:] = self._process_target(self.data[index][2])
 
         self.batch_start += current_batch_size
+        inputs = np.transpose(inputs, [0, 2, 3, 1])
+
         return inputs, targets, current_batch_size
         
     def load_folders(self, mode):
@@ -148,7 +149,7 @@ class FERPlusReader(object):
         '''
         self.reset()
         self.data = []
-        self.per_emotion_count = np.zeros(self.emotion_count, dtype=np.int)
+        self.per_emotion_count = np.zeros(self.emotion_count, dtype=int)
         
         for folder_name in self.sub_folders: 
             logging.info("Loading %s" % (os.path.join(self.base_folder, folder_name)))
